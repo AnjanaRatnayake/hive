@@ -1,0 +1,15 @@
+services:
+  eth-hive:
+    image: hive-anjana:latest
+    container_name: eth-hive
+    volumes:
+      - /run/podman/podman.sock:/var/run/docker.sock
+      # - /run/user/1000/podman/podman.sock:/var/run/docker.sock
+    # entrypoint: ["hive", "--sim=ethereum/engine", "--client=go-ethereum"]
+    entrypoint: /hive/geth_hive.sh
+    networks:
+      - eth-net
+networks:
+  eth-net:
+    driver: bridge
+    name: eth-net

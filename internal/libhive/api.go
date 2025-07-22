@@ -42,7 +42,7 @@ func newSimulationAPI(b ContainerBackend, env SimEnv, tm *TestManager, hive Hive
 	router.HandleFunc("/testsuite/{suite}/test/{test}/node/{node}/pause", api.unpauseClient).Methods("DELETE")
 	router.HandleFunc("/testsuite/{suite}/test", api.startTest).Methods("POST")
 	// post because the delete http verb does not always support a message body
-	router.HandleFunc("/testsuite/{suite}/test/{test}", api.endTest).Methods("POST")
+	router.HandleFunc("/testsuite/{suite}/test/{test}/testname/{testname}", api.endTest).Methods("POST")
 	router.HandleFunc("/testsuite", api.startSuite).Methods("POST")
 	router.HandleFunc("/testsuite/{suite}", api.endSuite).Methods("DELETE")
 	router.HandleFunc("/testsuite/{suite}/network/{network}", api.networkCreate).Methods("POST")
@@ -160,7 +160,9 @@ func (api *simAPI) endTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("API: test ended", "suite", suiteID, "test", testID, "pass", result.Pass)
+	testNameString := mux.Vars(r)["testname"]
+
+	slog.Info("API: test ended", "name", testNameString, "suite", suiteID, "test", testID, "pass", result.Pass)
 	serveOK(w)
 }
 

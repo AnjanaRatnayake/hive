@@ -53,6 +53,7 @@ func (r *Runner) Build(ctx context.Context, clientList []ClientDesignator, simLi
 
 // buildClients builds client images.
 func (r *Runner) buildClients(ctx context.Context, clientList []ClientDesignator) error {
+	// fmt.Printf("Antithesis - Client images should already be built separately (e.g. go-ethereum)\n")
 	if len(clientList) == 0 {
 		return errors.New("client list is empty, cannot simulate")
 	}
@@ -317,14 +318,14 @@ func createWorkspace(logdir string) error {
 
 func writeInstanceInfo(logdir string) {
 	var obj HiveInstance
-	
+
 	// Legacy fields for backward compatibility
 	obj.SourceCommit, obj.SourceDate = hiveVersion()
 	buildDate := hiveBuildTime()
 	if !buildDate.IsZero() {
 		obj.BuildDate = buildDate.Format("2006-01-02T15:04:05Z")
 	}
-	
+
 	// Enhanced version information
 	obj.HiveVersion = GetHiveVersion()
 
@@ -360,5 +361,3 @@ func hiveBuildTime() time.Time {
 	}
 	return stat.ModTime()
 }
-
-

@@ -3,6 +3,8 @@ module github.com/ethereum/hive
 go 1.22.0
 
 toolchain go1.23.5
+replace github.com/ethereum/go-ethereum => github.com/ethereum/go-ethereum v1.14.12
+replace github.com/ethereum/hive/hiveproxy => ./hiveproxy
 
 require (
 	github.com/davecgh/go-spew v1.1.1

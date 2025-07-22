@@ -98,11 +98,11 @@ func (sim *Simulation) CollectTestsOnly() bool {
 
 // EndTest finishes the test case, cleaning up everything, logging results, and returning
 // an error if the process could not be completed.
-func (sim *Simulation) EndTest(testSuite SuiteID, test TestID, testResult TestResult) error {
+func (sim *Simulation) EndTest(testSuite SuiteID, testName string, test TestID, testResult TestResult) error {
 	if sim.docs != nil {
 		return sim.docs.EndTest(testSuite, test, testResult)
 	}
-	url := fmt.Sprintf("%s/testsuite/%d/test/%d", sim.url, testSuite, test)
+	url := fmt.Sprintf("%s/testsuite/%d/test/%d/testname/%s", sim.url, testSuite, test, testName)
 	return post(url, &testResult, nil)
 }
 

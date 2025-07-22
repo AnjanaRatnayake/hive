@@ -375,7 +375,7 @@ func runTest(host *Simulation, test testSpec, runit func(t *T)) error {
 	defer func() {
 		t.mu.Lock()
 		defer t.mu.Unlock()
-		host.EndTest(test.suiteID, testID, t.result)
+		host.EndTest(test.suiteID, test.name, testID, t.result)
 	}()
 
 	// Run the test function.

@@ -41,7 +41,7 @@ func NewBuilder(client *docker.Client, cfg *Config, auth *docker.AuthConfigurati
 // BuildClientImage builds a docker image of the given client.
 func (b *Builder) BuildClientImage(ctx context.Context, client libhive.ClientDesignator) (string, error) {
 	dir := b.config.Inventory.ClientDirectory(client)
-	tag := fmt.Sprintf("hive/clients/%s:latest", client.Name())
+	tag := fmt.Sprintf("us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/%s:latest", client.Name())
 	dockerFile := client.Dockerfile()
 	err := b.buildImage(ctx, dir, dockerFile, tag, client.BuildArgs)
 	return tag, err
@@ -65,7 +65,8 @@ func (b *Builder) BuildSimulatorImage(ctx context.Context, name string, buildArg
 			buildDockerfile = p
 		}
 	}
-	tag := fmt.Sprintf("hive/simulators/%s:latest", name)
+	newName := strings.ReplaceAll(name, "/", "-") + "-anjana"
+	tag := fmt.Sprintf("us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/hive-simulators-%s:latest", newName)
 	err := b.buildImage(ctx, buildContextPath, buildDockerfile, tag, buildArgs)
 	return tag, err
 }
@@ -73,16 +74,7 @@ func (b *Builder) BuildSimulatorImage(ctx context.Context, name string, buildArg
 // BuildImage creates a container by archiving the given file system,
 // which must contain a file called "Dockerfile".
 func (b *Builder) BuildImage(ctx context.Context, name string, fsys fs.FS) error {
-	opts := b.buildConfig(ctx, name)
-	pipeR, pipeW := io.Pipe()
-	opts.InputStream = pipeR
-	go b.archiveFS(ctx, pipeW, fsys)
-
-	b.logger.Info("building image", "image", name, "nocache", opts.NoCache, "pull", b.config.PullEnabled)
-	if err := b.client.BuildImage(opts); err != nil {
-		b.logger.Error("image build failed", "image", name, "err", err)
-		return err
-	}
+	fmt.Printf("Antithesis - %s Image should already be built separately\n", name)
 	return nil
 }
 
@@ -211,30 +203,7 @@ func (b *Builder) ReadFile(ctx context.Context, image, path string) ([]byte, err
 // buildImage builds a single docker image from the specified context.
 // branch specifies a build argument to use a specific base image branch or github source branch.
 func (b *Builder) buildImage(ctx context.Context, contextDir, dockerFile, imageTag string, buildArgs map[string]string) error {
-	logger := b.logger.With("image", imageTag)
-	context, err := filepath.Abs(contextDir)
-	if err != nil {
-		logger.Error("can't find path to context directory", "err", err)
-		return err
-	}
-
-	opts := b.buildConfig(ctx, imageTag)
-	opts.ContextDir = context
-	opts.Dockerfile = dockerFile
-	logctx := []interface{}{"dir", contextDir, "nocache", opts.NoCache, "pull", opts.Pull}
-	if len(buildArgs) > 0 {
-		args := convertBuildArgs(buildArgs)
-		for _, arg := range args {
-			logctx = append(logctx, arg.Name, arg.Value)
-		}
-		opts.BuildArgs = args
-	}
-
-	logger.Info("building image", logctx...)
-	if err := b.client.BuildImage(opts); err != nil {
-		logger.Error("image build failed", "err", err)
-		return err
-	}
+	fmt.Printf("Antithesis - %s Images should already be built separately\n", imageTag)
 	return nil
 }
 

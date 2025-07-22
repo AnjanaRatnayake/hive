@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/hive/internal/libhive"
 )
 
-const hiveproxyTag = "hive/hiveproxy"
+const hiveproxyTag = "us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/hive-hiveproxy"
 
 // Build builds the hiveproxy image.
 func (cb *ContainerBackend) Build(ctx context.Context, b libhive.Builder) error {

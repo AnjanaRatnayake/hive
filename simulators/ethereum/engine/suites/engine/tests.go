@@ -2,6 +2,8 @@ package suite_engine
 
 import (
 	"math/big"
+	"crypto/rand"
+	"fmt"
 
 	"github.com/ethereum/hive/simulators/ethereum/engine/config"
 	"github.com/ethereum/hive/simulators/ethereum/engine/globals"
@@ -29,6 +31,20 @@ var Tests = make([]test.Spec, 0)
 func pUint64(v uint64) *uint64 {
 	return &v
 }
+
+func secureShuffle[T any](slice []T) error {
+       n := len(slice)
+       for i := n - 1; i > 0; i-- {
+               jBig, err := rand.Int(rand.Reader, big.NewInt(int64(i+1)))
+               if err != nil {
+                       return err
+               }
+               j := int(jBig.Int64())
+               slice[i], slice[j] = slice[j], slice[i]
+       }
+       return nil
+}
+
 
 // Register all test combinations for Paris
 func init() {
@@ -415,4 +431,10 @@ func init() {
 			}
 		}
 	}
+
+   err := secureShuffle(Tests)
+   if err != nil {
+           fmt.Println("Antithesis: Failed to shuffel")
+   }
+
 }
