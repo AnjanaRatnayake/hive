@@ -72,6 +72,7 @@ func (s GethNodeEngineStarter) StartGethNode(T *hivesim.T, testContext context.C
 	if bootClients != nil && len(bootClients) > 0 {
 		enodes = make([]string, len(bootClients))
 		for i, bootClient := range bootClients {
+			fmt.Printf("Antithesis - GethNodeEngineStarter - StartGethNode - the Geth client thats about to be launched will be peered with the Geth client (boot client): %s\n", bootClient.ID())
 			enodes[i], err = bootClient.EnodeURL()
 			if err != nil {
 				return nil, fmt.Errorf("Unable to obtain bootnode: %v", err)
@@ -82,6 +83,8 @@ func (s GethNodeEngineStarter) StartGethNode(T *hivesim.T, testContext context.C
 	if s.Config.MaxPeers == nil {
 		s.Config.MaxPeers = DefaultMaxPeers
 	}
+	fmt.Printf("Antithesis - GethNodeEngineStarter - StartGethNode - the Geth client thats about to be launched, MaxPeers: %s\n", s.Config.MaxPeers)
+
 
 	if s.ChainFile != "" {
 		s.Config.ChainFile = "./chains/" + s.ChainFile
@@ -90,7 +93,9 @@ func (s GethNodeEngineStarter) StartGethNode(T *hivesim.T, testContext context.C
 			s.Config.ChainFile = chainFilePath
 		}
 	}
+	fmt.Printf("Antithesis - GethNodeEngineStarter - StartGethNode - the Geth client thats about to be launched, ChainFile: %s\n", s.Config.ChainFile)
 
+	fmt.Printf("Antithesis - GethNodeEngineStarter - StartGethNode - calling creation of newNode\n")
 	g, err := newNode(s.Config, enodes, genesis)
 	if err != nil {
 		return nil, err
@@ -148,6 +153,7 @@ var _ client.EngineClient = (*GethNode)(nil)
 func newNode(config GethNodeTestConfiguration, bootnodes []string, genesis *core.Genesis) (*GethNode, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := os.MkdirTemp("", "")
+	fmt.Printf("Antithesis - newNode - the Geth client about to be launched by restart\n")
 
 	return restart(config, bootnodes, datadir, genesis)
 }
@@ -156,6 +162,7 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 	if startConfig.Name == "" {
 		startConfig.Name = "Modified Geth Module"
 	}
+	fmt.Printf("Antithesis - restart - the Geth client config created with name: %s, DataDir: %s, ChainFile: %s\n", startConfig.Name, datadir, startConfig.ChainFile)
 	config := &node.Config{
 		Name:    startConfig.Name,
 		DataDir: datadir,
@@ -167,7 +174,9 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 		UseLightweightKDF: true,
 	}
 	// Create the node and configure a full Ethereum node on it
+	fmt.Printf("Antithesis - restart - calling go-eth node.New function, to generate an official container that can run Eth of Light client\n")
 	stack, err := node.New(config)
+
 	if err != nil {
 		return nil, err
 	}
@@ -185,6 +194,7 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 		GPO:             ethconfig.Defaults.GPO,
 		Miner:           ethconfig.Defaults.Miner,
 	}
+	fmt.Printf("Antithesis - restart - calling go-eth eth.New function, to modify the stack so that it is an Eth node\n")
 	ethBackend, err := eth.New(stack, econfig)
 	if err != nil {
 		return nil, err
@@ -196,6 +206,7 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 		}
 	}
 
+	fmt.Printf("Antithesis - restart - starting Geth node\n")
 	err = stack.Start()
 	for stack.Server().NodeInfo().Ports.Listener == 0 {
 		time.Sleep(250 * time.Millisecond)
@@ -204,6 +215,7 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 	if bootnodes != nil && len(bootnodes) > 0 {
 		for _, bootnode := range bootnodes {
 			node := enode.MustParse(bootnode)
+			fmt.Printf("Antithesis - restart - adding peer %s\n", bootnode)
 			stack.Server().AddTrustedPeer(node)
 			stack.Server().AddPeer(node)
 		}
@@ -227,6 +239,7 @@ func restart(startConfig GethNodeTestConfiguration, bootnodes []string, datadir 
 
 	// Start thread to monitor the amount of gossiped blocks this node receives
 	go g.SubscribeP2PEvents()
+	fmt.Printf("Antithesis - restart - returning a GethNode object %s\n")
 
 	return g, err
 }
@@ -266,6 +279,7 @@ func (n *GethNode) ReOrgBackBlockChain(N uint64, currentBlock *types.Header) (*t
 }
 
 func (n *GethNode) SubscribeP2PEvents() {
+	fmt.Printf("Antithesis - restart - SubscribeP2PEvents - Monitoring p2p messages between this Geth node and outside, probably nothing if we have no peer\n")
 	eventChan := make(chan *p2p.PeerEvent)
 	subscription := n.node.Server().SubscribeEvents(eventChan)
 	for {
@@ -693,6 +707,7 @@ func (n *GethNode) PendingTransactionCount(ctx context.Context) (uint, error) {
 }
 
 func (n *GethNode) EnodeURL() (string, error) {
+	fmt.Println("Antithesis - Getting EnodeURL for Geth")
 	return n.node.Server().NodeInfo().Enode, nil
 }
 

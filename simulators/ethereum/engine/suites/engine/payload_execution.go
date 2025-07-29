@@ -2,7 +2,8 @@ package suite_engine
 
 import (
 	"math/big"
-
+	"fmt"
+	
 	api "github.com/ethereum/go-ethereum/beacon/engine"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/hive/simulators/ethereum/engine/client"
@@ -322,6 +323,7 @@ func (spec NewPayloadOnSyncingClientTest) Execute(t *test.Env) {
 		// To allow sending the primary engine client into SYNCING state, we need a secondary client to guide the payload creation
 		var err error
 		secondaryClient, err = hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles)
+		fmt.Printf("Antithesis - engine/payload_execution.go - NewPayloadOnSyncingClientTest - Execute - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
 
 		if err != nil {
 			t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)
@@ -497,6 +499,7 @@ func (spec NewPayloadWithMissingFcUTest) Execute(t *test.Env) {
 	var secondaryEngineTest *test.TestEngineClient
 	{
 		secondaryEngine, err := hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles)
+		fmt.Printf("Antithesis - engine/payload_execution.go - NewPayloadWithMissingFcUTest - Execute - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
 
 		if err != nil {
 			t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)

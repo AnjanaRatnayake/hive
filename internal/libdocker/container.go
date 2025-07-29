@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+	"encoding/json"
 
 	"github.com/ethereum/hive/hiveproxy"
 	"github.com/ethereum/hive/internal/libhive"
@@ -255,9 +256,12 @@ func (b *ContainerBackend) CreateNetwork(name string) (string, error) {
 // NetworkNameToID finds the network ID of network by the given name.
 func (b *ContainerBackend) NetworkNameToID(name string) (string, error) {
 	networks, err := b.client.ListNetworks()
+	a, _ := json.MarshalIndent(networks, "", "  ")
+	fmt.Printf("Antithesis - container.go - NetworkNameToID - calling docker's listNetworks: %s\n", a)
 	if err != nil {
 		return "", err
 	}
+	fmt.Printf("Antithesis - container.go - NetworkNameToID - checking if network name: %s is inside the networks[x].Name \n", name)
 	for _, net := range networks {
 		if net.Name == name {
 			return net.ID, nil
@@ -285,13 +289,18 @@ func (b *ContainerBackend) RemoveNetwork(id string) error {
 func (b *ContainerBackend) ContainerIP(containerID, networkID string) (net.IP, error) {
 	details, err := b.client.InspectContainerWithOptions(docker.InspectContainerOptions{
 		ID: containerID,
-	})
+	}) // Function call to DockerClient Go module
 	if err != nil {
+		fmt.Printf("Antithesis - container.go - ContainerIP - error doing InspectContainerWithOptions for containerID %s: %s\n", containerID, err)
 		return nil, err
 	}
+	a, _ := json.MarshalIndent(details, "", "  ")
+	fmt.Printf("Antithesis - container.go - ContainerIP - what are the details for containerID %s: %s\n", containerID, a)
+	fmt.Printf("Antithesis - container.go - ContainerIP - going to see if this networkID %s matches with details.NetworkSettings.Networks[x].NetworkID \n", networkID)
+
 	// Range over all networks to which the container is connected and get network-specific IP.
 	for _, network := range details.NetworkSettings.Networks {
-		if network.NetworkID == networkID {
+		if network.NetworkID == "podman" {
 			return net.ParseIP(network.IPAddress), nil
 		}
 	}

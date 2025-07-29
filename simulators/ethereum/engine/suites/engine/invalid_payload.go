@@ -67,6 +67,7 @@ func (tc InvalidPayloadTestCase) Execute(t *test.Env) {
 	if tc.Syncing {
 		// To allow sending the primary engine client into SYNCING state, we need a secondary client to guide the payload creation
 		secondaryClient, err := hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles)
+		fmt.Printf("Antithesis - engine/invalid_payload.go - InvalidPayloadTestCase - Execute - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
 		if err != nil {
 			t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)
 		}
@@ -329,6 +330,7 @@ func (i PayloadBuildAfterInvalidPayloadTest) GetName() string {
 func (tc PayloadBuildAfterInvalidPayloadTest) Execute(t *test.Env) {
 	// Add a second client to build the invalid payload
 	secondaryEngine, err := hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles)
+	fmt.Printf("Antithesis - engine/invalid_payload.go - PayloadBuildAfterInvalidPayloadTest - Execute - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
 
 	if err != nil {
 		t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)

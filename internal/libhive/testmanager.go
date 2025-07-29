@@ -304,12 +304,16 @@ func (manager *TestManager) ContainerIP(testSuite TestSuiteID, networkName, cont
 
 	var networkID string
 	// networkID "bridge" is special.
+	fmt.Printf("Antithesis - testmanager.go - ContainerIP - getting the networkID for network: %s \n", networkName)
 	if networkName == "bridge" {
+		fmt.Printf("Antithesis - testmanager.go - ContainerIP - special case bridge network\n")
 		var err error
 		networkID, err = manager.backend.NetworkNameToID(networkName)
 		if err != nil {
+			fmt.Printf("Antithesis - testmanager.go - ContainerIP - failed to get network id \n")
 			return "", err
 		}
+		fmt.Printf("Antithesis - testmanager.go - ContainerIP - got network id %s \n", networkID)
 	} else {
 		var exists bool
 		networkID, exists = manager.networks[testSuite][networkName]

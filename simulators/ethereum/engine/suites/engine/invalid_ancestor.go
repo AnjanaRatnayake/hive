@@ -230,8 +230,10 @@ func (tc InvalidMissingAncestorReOrgSyncTest) Execute(t *test.Env) {
 	}
 	if tc.ReOrgFromCanonical {
 		// If we are doing a re-org from canonical, we can add both nodes as peers from the start
+		fmt.Printf("Antithesis - engine/invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest - Execute - adding both nodes as peers from the StartGethNode \n")
 		secondaryClient, err = starter.StartGethNode(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles, t.Engine)
 	} else {
+		fmt.Printf("Antithesis - engine/invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest - Execute - adding only clients as peers from the StartGethNode \n")
 		secondaryClient, err = starter.StartGethNode(t.T, t.TestContext, t.Genesis, t.ClientParams, t.ClientFiles)
 	}
 	if err != nil {
@@ -314,14 +316,24 @@ func (tc InvalidMissingAncestorReOrgSyncTest) Execute(t *test.Env) {
 				ParentHash: &pHash,
 				ExtraData:  &([]byte{0x01}),
 			}
+			fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - setting the parent hash to be the latest hash \n")
 			sidePayload, err = customizer.CustomizePayload(t.Rand, &t.CLMock.LatestPayloadBuilt)
+			fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - generating new valid payload from executableData retrieved by hive_rpc.go GetPayload, block %s of %s \n", len(altChainPayloads), n)
 			if err != nil {
 				t.Fatalf("FAIL (%s): Unable to customize payload: %v", t.TestName, err)
 			}
 			if len(altChainPayloads) == tc.InvalidIndex {
 				sidePayload, err = helper.GenerateInvalidPayload(t.Rand, sidePayload, tc.InvalidField)
+				fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - we have reached the required length tc.InvalidIndex = %s to make invalid payload: generating invalid payload from valid payload\n", tc.InvalidIndex)
 				if err != nil {
-					t.Fatalf("FAIL (%s): Unable to customize payload: %v", t.TestName, err)
+					t.Fatalf("FAIL (%s): Unable to customize payload - to make invalid: %v", t.TestName, err)
+				}
+				b, err := json.MarshalIndent(sidePayload, "", "  ")
+				if err != nil {
+					fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - invalid executableData - error marshalling: %s \n", err)
+					fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - invalid executableData unmarshalled: %+v \n", sidePayload)
+				} else {
+					fmt.Printf("Antithesis - invalid_ancestor.go - InvalidMissingAncestorReOrgSyncTest.Execute.ProduceBlocks.OnGetPayload - invalid executableData - %s \n", b)
 				}
 			}
 			altChainPayloads = append(altChainPayloads, sidePayload)

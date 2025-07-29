@@ -52,10 +52,8 @@ push-config:
 push-hive-simulators-engine:
 	customer credentials_shell -c "podman push us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/hive-simulators-ethereum-engine-anjana:latest"
 
-# Need to figure out how to build for real, right now we just build through the Go's calls to docker
 push-hive-proxy:
 	customer credentials_shell -c "podman push us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/hive-hiveproxy:latest"
 
-# Need to figure out how to build for real, right now we just build through the Go's calls to docker
 push-geth:
 	customer credentials_shell -c "podman push us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/go-ethereum:latest"

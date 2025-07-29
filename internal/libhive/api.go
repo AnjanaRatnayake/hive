@@ -500,11 +500,13 @@ func (api *simAPI) networkCreate(w http.ResponseWriter, r *http.Request) {
 
 	networkName := mux.Vars(r)["network"]
 	err = api.tm.CreateNetwork(suiteID, networkName)
+	fmt.Printf("Antithesis - about to create network %s\n", networkName)
 	if err != nil {
 		slog.Error("API: failed to create network", "network", networkName, "error", err)
 		serveError(w, err, http.StatusBadRequest)
 		return
 	}
+	fmt.Printf("Antithesis - network created %s\n", networkName)
 	slog.Info("API: network created", "name", networkName)
 	serveOK(w)
 }
@@ -519,11 +521,13 @@ func (api *simAPI) networkRemove(w http.ResponseWriter, r *http.Request) {
 
 	network := mux.Vars(r)["network"]
 	err = api.tm.RemoveNetwork(suiteID, network)
+	fmt.Printf("Antithesis - about to remove network %s \n", network)
 	if err != nil {
 		slog.Error("API: failed to remove network", "network", network, "error", err)
 		serveError(w, err, http.StatusInternalServerError)
 		return
 	}
+	fmt.Printf("Antithesis - removed network %s \n", network)
 	slog.Info("API: docker network removed", "network", network)
 	serveOK(w)
 }
@@ -531,6 +535,7 @@ func (api *simAPI) networkRemove(w http.ResponseWriter, r *http.Request) {
 // networkIPGet gets the IP address of a container on a network.
 func (api *simAPI) networkIPGet(w http.ResponseWriter, r *http.Request) {
 	suiteID, err := api.requestSuite(r)
+	fmt.Printf("Antithesis - Hive API - networkIPGet - request recieved\n")
 	if err != nil {
 		serveError(w, err, http.StatusBadRequest)
 		return
@@ -538,6 +543,7 @@ func (api *simAPI) networkIPGet(w http.ResponseWriter, r *http.Request) {
 
 	node := mux.Vars(r)["node"]
 	network := mux.Vars(r)["network"]
+	fmt.Printf("Antithesis - Hive API - networkIPGet - about to call ContainerIP with network %s and node %s \n", network, node)
 	ipAddr, err := api.tm.ContainerIP(suiteID, network, node)
 	if err != nil {
 		slog.Error("API: failed to get container IP", "container", node, "error", err)

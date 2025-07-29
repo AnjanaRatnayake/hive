@@ -239,6 +239,8 @@ func (tec *TestEngineClient) TestEngineNewPayloadV1(payload *typ.ExecutableData)
 	ctx, cancel := context.WithTimeout(tec.TestContext, globals.RPCTimeout)
 	defer cancel()
 	status, err := tec.Engine.NewPayloadV1(ctx, payload)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV1 - return status %s \n", status)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV1 - return error %s \n", err)
 	ret := &NewPayloadResponseExpectObject{
 		ExpectEnv: &ExpectEnv{Env: tec.Env},
 		Payload:   payload,
@@ -256,6 +258,8 @@ func (tec *TestEngineClient) TestEngineNewPayloadV2(payload *typ.ExecutableData)
 	ctx, cancel := context.WithTimeout(tec.TestContext, globals.RPCTimeout)
 	defer cancel()
 	status, err := tec.Engine.NewPayloadV2(ctx, payload)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV2 - return status %s \n", status)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV2 - return error %s \n", err)
 	ret := &NewPayloadResponseExpectObject{
 		ExpectEnv: &ExpectEnv{Env: tec.Env},
 		Payload:   payload,
@@ -273,6 +277,8 @@ func (tec *TestEngineClient) TestEngineNewPayloadV3(payload *typ.ExecutableData)
 	ctx, cancel := context.WithTimeout(tec.TestContext, globals.RPCTimeout)
 	defer cancel()
 	status, err := tec.Engine.NewPayloadV3(ctx, payload)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV3 - return status %s \n", status)
+	fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV3 - return error %s \n", err)
 	ret := &NewPayloadResponseExpectObject{
 		ExpectEnv: &ExpectEnv{Env: tec.Env},
 		Payload:   payload,
@@ -292,6 +298,7 @@ func (tec *TestEngineClient) TestEngineNewPayload(payload *typ.ExecutableData) *
 	}
 	version := tec.EngineAPIVersionResolver.NewPayloadVersion(payload.Timestamp)
 	if version == 3 {
+		// fmt.Printf("Antithesis - TestEngineClient - TestEngineNewPayloadV3 - calling tec.Engine.NewPayloadV3, this is a Geth client function")
 		return tec.TestEngineNewPayloadV3(payload)
 	} else if version == 2 {
 		return tec.TestEngineNewPayloadV2(payload)

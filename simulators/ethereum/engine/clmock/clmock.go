@@ -449,6 +449,7 @@ func (cl *CLMocker) GetNextPayload() {
 	ctx, cancel := context.WithTimeout(cl.TestContext, globals.RPCTimeout)
 	defer cancel()
 	version := cl.ForkConfig.GetPayloadVersion(cl.LatestPayloadAttributes.Timestamp)
+	fmt.Printf("Antithesis - clmock - GetNextPayload - about to call cl.NextBlockProducer.GetPayload, for this payloadID: %s \n", cl.NextPayloadID)
 	cl.LatestPayloadBuilt, cl.LatestBlockValue, cl.LatestBlobBundle, cl.LatestShouldOverrideBuilder, err = cl.NextBlockProducer.GetPayload(ctx, version, cl.NextPayloadID)
 
 	if err != nil {
@@ -490,6 +491,7 @@ func (cl *CLMocker) broadcastNextNewPayload() {
 	version := cl.ForkConfig.NewPayloadVersion(cl.LatestPayloadBuilt.Timestamp)
 	validations := 0
 	for _, resp := range cl.BroadcastNewPayload(&cl.LatestPayloadBuilt, version) {
+		fmt.Printf("Antithesis - clmock.go - broadcasting new payload ExecutableData \n")
 		if resp.Error != nil {
 			cl.Logf("CLMocker: BroadcastNewPayload Error (%v): %v\n", resp.Container, resp.Error)
 		} else {
@@ -578,7 +580,9 @@ func (cl *CLMocker) ProduceSingleBlock(callbacks BlockProcessCallbacks) {
 	}
 
 	if callbacks.OnPayloadProducerSelected != nil {
+		fmt.Println("Antithesis - calling OnPayloadProducerSelected()")
 		callbacks.OnPayloadProducerSelected()
+		fmt.Println("Antithesis - leaving OnPayloadProducerSelected()")
 	}
 
 	cl.GeneratePayloadAttributes()
@@ -598,10 +602,14 @@ func (cl *CLMocker) ProduceSingleBlock(callbacks BlockProcessCallbacks) {
 	// Give the client a delay between getting the payload ID and actually retrieving the payload
 	time.Sleep(cl.PayloadProductionClientDelay)
 
+	fmt.Println("Antithesis - calling GetNextPayload()")
 	cl.GetNextPayload()
+	fmt.Println("Antithesis - leaving GetNextPayload()")
 
 	if callbacks.OnGetPayload != nil {
+		fmt.Println("Antithesis - calling OnGetPayload()")
 		callbacks.OnGetPayload()
+		fmt.Println("Antithesis - leaving OnGetPayload()")
 	}
 
 	cl.broadcastNextNewPayload()
@@ -708,6 +716,7 @@ func (cl *CLMocker) BroadcastNewPayload(ed *typ.ExecutableData, version int) []E
 		responses[i].Container = ec.ID()
 		ctx, cancel := context.WithTimeout(cl.TestContext, globals.RPCTimeout)
 		defer cancel()
+		fmt.Printf("Antithesis - CLMocker - BroadcastNewPayload - calling ec.NewPayload \n")
 		execPayloadResp, err := ec.NewPayload(ctx, version, ed)
 		if err != nil {
 			cl.Errorf("CLMocker: Could not ExecutePayloadV1: %v", err)

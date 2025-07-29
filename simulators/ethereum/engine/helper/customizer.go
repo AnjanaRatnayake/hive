@@ -339,7 +339,8 @@ func (customData *CustomPayloadData) CustomizePayload(randSource *rand.Rand, bas
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("txsHash: %v\n", txsHash)
+	fmt.Printf("Antithesis - customizer.go - CustomizePayload - Customizing payload probably the latest payload built\n")
+	fmt.Printf("Antithesis - customizer.go - CustomizePayload - This hash is calculated by taking the basePayload and hashing all transactions in it: txsHash: %v\n", txsHash)
 	// Start by filling the header with the basePayload information
 	customPayloadHeader := types.Header{
 		ParentHash:  basePayload.ParentHash,
@@ -361,6 +362,7 @@ func (customData *CustomPayloadData) CustomizePayload(randSource *rand.Rand, bas
 	}
 	// Overwrite custom information
 	if customData.ParentHash != nil {
+		fmt.Printf("Antithesis - customizer.go - CustomizePayload - Customizing parent hash to be %s \n", *customData.ParentHash)
 		customPayloadHeader.ParentHash = *customData.ParentHash
 	}
 	if customData.FeeRecipient != nil {

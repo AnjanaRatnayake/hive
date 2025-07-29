@@ -168,6 +168,7 @@ type Client struct {
 
 // EnodeURL returns the default peer-to-peer endpoint of the client.
 func (c *Client) EnodeURL() (string, error) {
+	fmt.Printf("Antithesis - hivesim/testapi.go - EnodeURL - checking container status using endpoint %s \n", c.Container)
 	return c.test.Sim.ClientEnodeURL(c.test.SuiteID, c.test.TestID, c.Container)
 }
 

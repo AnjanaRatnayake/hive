@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"encoding/json"
 
 	"github.com/ethereum/go-ethereum"
 	api "github.com/ethereum/go-ethereum/beacon/engine"
@@ -47,6 +48,7 @@ func (s HiveRPCEngineStarter) StartClient(T *hivesim.T, testContext context.Cont
 		ethPort    = s.EthPort
 		jwtSecret  = s.JWTSecret
 	)
+	fmt.Printf("Antithesis - HiveRPCEngineStarter - StartClient - starting HiveRPCEngine client \n")
 	if clientType == "" {
 		cs, err := T.Sim.ClientTypes()
 		if err != nil {
@@ -75,6 +77,7 @@ func (s HiveRPCEngineStarter) StartClient(T *hivesim.T, testContext context.Cont
 			err    error
 		)
 		for i, bootClient := range bootClients {
+			fmt.Printf("Antithesis - HiveRPCEngineStarter - StartClient - boot client: %s \n", bootClient.ID())
 			enodes[i], err = bootClient.EnodeURL()
 			if err != nil {
 				return nil, fmt.Errorf("unable to obtain bootnode: %v", err)
@@ -189,6 +192,7 @@ func (ec *HiveRPCEngineClient) ID() string {
 }
 
 func (ec *HiveRPCEngineClient) EnodeURL() (string, error) {
+	fmt.Println("Antithesis - hive_rpc.go - HiveRPCEngineClient - EnodeURL")
 	return ec.h.EnodeURL()
 }
 
@@ -330,12 +334,22 @@ func (ec *HiveRPCEngineClient) GetPayload(ctx context.Context, version int, payl
 		err                   error
 		rpcString             = fmt.Sprintf("engine_getPayloadV%d", version)
 	)
+	fmt.Printf("Antithesis - hive_rpc.go - GetPayload - about to get response from %s for payloadID %s\n", rpcString, payloadId)
 
 	if err = ec.PrepareDefaultAuthCallToken(); err != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - PrepareDefaultAuthCallToken - payloadId %s - failed with error: %s\n",payloadId, err)
+		b, err := json.MarshalIndent(executableData, "", "  ")
+		if err != nil {
+			fmt.Printf("Antithesis - hive_rpc.go - GetPayload - PrepareDefaultAuthCallToken failed - payloadId %s - error marshalling: %s \n",payloadId, err)
+			fmt.Printf("Antithesis - hive_rpc.go - GetPayload - PrepareDefaultAuthCallToken failed - payloadId %s - unmarshalled: %+v \n",payloadId, executableData)
+		} else {
+			fmt.Printf("Antithesis - hive_rpc.go - GetPayload - PrepareDefaultAuthCallToken failed - payloadId %s - executableData %s\n",payloadId, b)
+		}
 		return executableData, nil, nil, nil, err
 	}
 
 	if version >= 2 {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - payloadId %s - version >= 2 call site to Geth\n", payloadId)
 		var response typ.ExecutionPayloadEnvelope
 		err = ec.c.CallContext(ctx, &response, rpcString, payloadId)
 		if response.ExecutionPayload != nil {
@@ -345,9 +359,41 @@ func (ec *HiveRPCEngineClient) GetPayload(ctx context.Context, version int, payl
 		blobsBundle = response.BlobsBundle
 		shouldOverrideBuilder = response.ShouldOverrideBuilder
 	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - payloadId %s - version < 2 call site to Geth\n", payloadId)
 		err = ec.c.CallContext(ctx, &executableData, rpcString, payloadId)
 	}
 
+	b, err := json.MarshalIndent(executableData, "", "  ")
+	if err != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - payloadId %s - executableData - error marshalling: %s \n",payloadId, err)
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - payloadId %s - executableData unmarshalled: %+v \n",payloadId, executableData)
+	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - payloadId %s - executableData - %s \n", payloadId, b)
+	}
+	// log.Printf("ExecutableData: %+v", executableData)
+	if blockValue != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - BlockValue: %s \n", blockValue.String())
+	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - BlockValue: <nil> \n")
+	}
+
+	if blobsBundle != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - BlobsBundle: %+v \n", blobsBundle)
+	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - BlobsBundle: <nil> \n")
+	}
+
+	if shouldOverrideBuilder != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - ShouldOverrideBuilder: %v \n", *shouldOverrideBuilder)
+	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - ShouldOverrideBuilder: <nil> \n")
+	}
+
+	if err != nil {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - Error: %v \n", err)
+	} else {
+		fmt.Printf("Antithesis - hive_rpc.go - GetPayload - Error: <nil> \n")
+	}
 	return executableData, blockValue, blobsBundle, shouldOverrideBuilder, err
 }
 
@@ -411,6 +457,14 @@ func (ec *HiveRPCEngineClient) NewPayload(ctx context.Context, version int, payl
 	if err := ec.PrepareDefaultAuthCallToken(); err != nil {
 		return result, err
 	}
+	fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayload - about to call endpoint engine_newPayloadV%d \n", version)
+	b, err := json.MarshalIndent(payload, "", "  ")
+	if err != nil {
+		fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayload - error marshalling: %s \n", err)
+		fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayload - unmarshalled: %+v \n", payload)
+	} else {
+		fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayload - executableData %s\n", b)
+	}
 
 	if version >= 3 {
 		err = ec.c.CallContext(ctx, &result, fmt.Sprintf("engine_newPayloadV%d", version), payload, payload.VersionedHashes, payload.ParentBeaconBlockRoot)
@@ -422,16 +476,19 @@ func (ec *HiveRPCEngineClient) NewPayload(ctx context.Context, version int, payl
 }
 
 func (ec *HiveRPCEngineClient) NewPayloadV1(ctx context.Context, payload *typ.ExecutableData) (api.PayloadStatusV1, error) {
+	fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayloadV1 - calling hive API function NewPayload against Geth: %s\n", ec.ID())
 	ec.latestPayloadSent = payload
 	return ec.NewPayload(ctx, 1, payload)
 }
 
 func (ec *HiveRPCEngineClient) NewPayloadV2(ctx context.Context, payload *typ.ExecutableData) (api.PayloadStatusV1, error) {
+	fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayloadV2 - calling hive API function NewPayload against Geth: %s\n", ec.ID())
 	ec.latestPayloadSent = payload
 	return ec.NewPayload(ctx, 2, payload)
 }
 
 func (ec *HiveRPCEngineClient) NewPayloadV3(ctx context.Context, payload *typ.ExecutableData) (api.PayloadStatusV1, error) {
+	fmt.Printf("Antithesis - HiveRPCEngineClient - NewPayloadV3 - calling hive API function NewPayload against Geth: %s\n", ec.ID())
 	ec.latestPayloadSent = payload
 	return ec.NewPayload(ctx, 3, payload)
 }

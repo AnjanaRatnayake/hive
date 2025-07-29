@@ -251,6 +251,7 @@ func (sim *Simulation) ClientEnodeURL(testSuite SuiteID, test TestID, node strin
 	if sim.docs != nil {
 		return "", errors.New("ClientEnodeURL is not supported in docs mode")
 	}
+	fmt.Printf("Antithesis - hivesim/hive.go - ClientEnodeURL - fetch the EnodeURL of %s \n", node)
 	return sim.ClientEnodeURLNetwork(testSuite, test, node, "bridge")
 }
 
@@ -285,10 +286,13 @@ func (sim *Simulation) ClientEnodeURLNetwork(testSuite SuiteID, test TestID, nod
 	}
 
 	// Get the actual IP for the container
+	fmt.Printf("Antithesis - hivesim/hive.go - ClientEnodeURLNetwork - getting IP of node: %s from network: %s \n", node, network)
 	ip, err := sim.ContainerNetworkIP(testSuite, network, node)
 	if err != nil {
 		return "", err
 	}
+	fmt.Printf("Antithesis - hivesim/hive.go - ClientEnodeURLNetwork - got IP of %s - %s \n", node, ip)
+
 
 	// Change IP with the real IP for the desired docker network
 	fixedIP := enode.NewV4(n.Pubkey(), net.ParseIP(ip), tcpPort, udpPort)
@@ -316,6 +320,7 @@ func (sim *Simulation) CreateNetwork(testSuite SuiteID, networkName string) erro
 		return errors.New("CreateNetwork is not supported in docs mode")
 	}
 	url := fmt.Sprintf("%s/testsuite/%d/network/%s", sim.url, testSuite, networkName)
+	fmt.Printf("Antithesis - About to call Hive API to create network \n")
 	return post(url, nil, nil)
 }
 
@@ -325,6 +330,7 @@ func (sim *Simulation) RemoveNetwork(testSuite SuiteID, network string) error {
 		return errors.New("RemoveNetwork is not supported in docs mode")
 	}
 	url := fmt.Sprintf("%s/testsuite/%d/network/%s", sim.url, testSuite, network)
+	fmt.Printf("Antithesis - About to call Hive API to remove network \n")
 	return requestDelete(url)
 }
 
@@ -354,6 +360,7 @@ func (sim *Simulation) ContainerNetworkIP(testSuite SuiteID, network, containerI
 	if sim.docs != nil {
 		return "", errors.New("ContainerNetworkIP is not supported in docs mode")
 	}
+	fmt.Printf("Antithesis - About to call Hive API for the network and IP information \n")
 	var (
 		url  = fmt.Sprintf("%s/testsuite/%d/network/%s/%s", sim.url, testSuite, network, containerID)
 		resp string

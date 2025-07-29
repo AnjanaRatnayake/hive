@@ -125,6 +125,8 @@ func postMergeSync(t *test.Env) {
 	t.CLMock.PayloadProductionClientDelay = time.Second
 
 	secondaryEngine, err := hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams.Set("HIVE_MINER", ""), t.ClientFiles, t.Engine)
+	fmt.Printf("Antithesis - sync/tests.go - postMergeSync - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
+	
 	if err != nil {
 		t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)
 	}
@@ -177,6 +179,8 @@ func incrementalPostMergeSync(t *test.Env) {
 	t.CLMock.PayloadProductionClientDelay = time.Second
 
 	secondaryEngine, err := hive_rpc.HiveRPCEngineStarter{}.StartClient(t.T, t.TestContext, t.Genesis, t.ClientParams.Set("HIVE_MINER", ""), t.ClientFiles, t.Engine)
+	fmt.Printf("Antithesis - sync/tests.go - incrementalPostMergeSync - adding secondary client using the hive_rpc.HiveRPCEngineStarter{}.StartClient \n")
+	
 	if err != nil {
 		t.Fatalf("FAIL (%s): Unable to spawn a secondary client: %v", t.TestName, err)
 	}

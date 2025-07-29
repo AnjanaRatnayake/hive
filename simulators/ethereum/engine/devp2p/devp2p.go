@@ -46,6 +46,7 @@ type P2PDest struct {
 }
 
 func PeerEngineClient(engine client.EngineClient, consensusEngine *clmock.CLMocker) (*Conn, error) {
+	fmt.Printf("Antithesis - engine/devp2p.go - PeerEngineClient - Peering engine node about to call EnodeURL() \n")
 	enodeURL, err := engine.EnodeURL()
 	if err != nil {
 		return nil, fmt.Errorf("error getting enode: %v", err)
