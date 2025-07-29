@@ -7,6 +7,7 @@ https://public.antithesis.com/report/_orV1zvTzuU0ap1iUvvG2Aqa/GYEhnUBHoLhd73wl_l
 Ethereum Foundation maintains two public Hive instances to check for consensus, p2p and
 blockchain compatibility:
 
+- https://hive.ethpandaops.io/
 - eth1 consensus, graphql and p2p tests are on <https://hivetests.ethdevops.io>
 - Engine API integration and rpc tests are on <https://hivetests2.ethdevops.io>
 
