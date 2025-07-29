@@ -1,4 +1,4 @@
-name: Build & Push config
+name: Build & Push hive-config
 
 on: 
   schedule:
@@ -28,7 +28,7 @@ jobs:
       id: meta-container-image
       uses: docker/metadata-action@v5
       with:
-        images: us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/config
+        images: us-central1-docker.pkg.dev/molten-verve-216720/demo-repository/hive-config
         tags: |
           type=sha
           latest
